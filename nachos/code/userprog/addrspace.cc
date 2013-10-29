@@ -183,6 +183,15 @@ AddrSpace::SaveState ()
 {
 }
 
+
+int
+AddrSpace::AllocateUserStack ()
+{
+    return numPages * PageSize - 256;
+}
+
+
+
 //----------------------------------------------------------------------
 // AddrSpace::RestoreState
 //      On a context switch, restore the machine state so that
