@@ -27,6 +27,7 @@
 
 #ifdef CHANGED
 #include <limits.h>
+#include "userthread.h"
 #endif
 
 //----------------------------------------------------------------------
@@ -129,6 +130,20 @@ ExceptionHandler (ExceptionType which)
 				/* 4 because it's the size of a int. */
 				/* We checked this with the sizeof operator */
 				machine->WriteMem(i,4,tmp);
+				break;
+
+			}
+
+
+			case SC_ThreadCreate:
+			{
+				
+				int i = machine->ReadRegister(4);
+				int j = machine->ReadRegister(5);
+				//printf("i : %d\n",i );
+				//printf("j : %d\n",j );
+				do_ThreadCreate(i, j);
+
 				break;
 
 			}
