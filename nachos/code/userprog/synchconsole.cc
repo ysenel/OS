@@ -8,6 +8,9 @@
 static Semaphore *readAvail;
 static Semaphore *writeDone;
 
+static Semaphore *threadPutSem;
+static Semaphore *threadGetSem;
+
 static void ReadAvail(void *arg) { (void) arg; readAvail->V(); }
 static void WriteDone(void *arg) { (void) arg; writeDone->V(); }
 
@@ -16,6 +19,10 @@ SynchConsole::SynchConsole(const char *in, const char *out)
 {
 	readAvail = new Semaphore("read avail", 0);
 	writeDone = new Semaphore("write done", 0);
+
+	threadPutSem = new Semaphore("thread put", 1);
+	threadGetSem = new Semaphore("thread get", 1);
+
 	console = new Console(in, out, ReadAvail, WriteDone, NULL);
 }
 
@@ -24,30 +31,42 @@ SynchConsole::~SynchConsole()
 	delete console;
 	delete writeDone;
 	delete readAvail;
+	delete threadPutSem;
+	delete threadGetSem;
 }
 
 void SynchConsole::SynchPutChar(int ch)
 {
+	threadGetSem->P();
+	threadPutSem->P();
 	console->PutChar (ch);
 	writeDone->P ();
+	threadPutSem->V();
+	threadGetSem->V();
 }
 
 int SynchConsole::SynchGetChar()
 {
-
+	
+	threadGetSem->P();
 	readAvail->P();
-	return console->GetChar();
+	int c = console->GetChar();
+	threadGetSem->V();
+	return c;
 }
 
 void SynchConsole::SynchPutString(const char s[])
 {
+	threadGetSem->P();
 	int taille = strlen(s);
 	for (int i = 0; i < taille; i++)
 		SynchPutChar(s[i]);
+	threadGetSem->V();
 }
 
 void SynchConsole::SynchGetString(char *s, int n)
 {
+	threadGetSem->P();
 	char c;
 	for(int i = 0; i < n; i++)
 	{
@@ -56,6 +75,7 @@ void SynchConsole::SynchGetString(char *s, int n)
 			break;
 		s[i] = c;
 	}
+	threadGetSem->V();
 }
 
 /* Copies a string from the MIPS virtual memory to a Linux string. */
