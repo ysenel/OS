@@ -140,8 +140,6 @@ ExceptionHandler (ExceptionType which)
 				
 				int i = machine->ReadRegister(4);
 				int j = machine->ReadRegister(5);
-				printf("i : %d\n",i );
-				//printf("j : %d\n",j );
 				do_ThreadCreate(i, j);
 
 				break;

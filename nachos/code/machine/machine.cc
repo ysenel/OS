@@ -103,8 +103,6 @@ Machine::RaiseException(ExceptionType which, int badVAddr)
 {
     enum MachineStatus oldStatus = interrupt->getStatus();
     DEBUG('m', "Exception: %s\n", exceptionNames[which]);
-    printf("ex type: %s\n", exceptionNames[which]);
-
     registers[BadVAddrReg] = badVAddr;
     DelayedLoad(0, 0);			// finish anything in progress
     interrupt->setStatus(SystemMode);
