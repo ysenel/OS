@@ -3,18 +3,30 @@
 #include "machine.h"
 #include "system.h"
 
-typedef struct {
+
+
+
+typedef struct 
+{
 	int f;
 	int arg;
 
 }threadInfo;
 
+Semaphore *mainStop = new Semaphore("mainStop", 1);
+
+static int thread_count = 0;
+
 int ff;
 
-int do_ThreadCreate(int f, int arg){
+int do_ThreadCreate(int f, int arg)
+{
+    if(thread_count == 0)
+        mainStop->P();
+    
 
     threadInfo *t = (threadInfo *)malloc(sizeof(*t));
-	
+	thread_count++;
     
 	t->f = f;
 	t->arg = arg;
@@ -65,8 +77,13 @@ static void StartUserThread(void *schmurtz){
     
 }
 
-void do_ThreadExit(){
+void do_ThreadExit()
+{
+    if(thread_count == 1)
+        mainStop->V();
+    
 
-    currentThread->Finish ();
-
+    currentThread->Finish();
+    thread_count--;
+    
 }

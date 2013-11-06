@@ -28,6 +28,7 @@
 #ifdef CHANGED
 #include <limits.h>
 #include "userthread.h"
+extern Semaphore *mainStop;
 #endif
 
 //----------------------------------------------------------------------
@@ -99,8 +100,11 @@ ExceptionHandler (ExceptionType which)
 			case SC_Exit:
 			{
 				DEBUG ('a', "Shutdown, initiated by user program.\n");
+				mainStop->P();
+			    
 				printf("\nEnd of program: return value %d\n", machine->ReadRegister(4));
-			    interrupt->Halt ();
+				interrupt->Halt();
+				
 			    break;
 			}
 

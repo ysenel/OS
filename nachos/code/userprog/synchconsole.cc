@@ -37,12 +37,10 @@ SynchConsole::~SynchConsole()
 
 void SynchConsole::SynchPutChar(int ch)
 {
-	threadGetSem->P();
 	threadPutSem->P();
 	console->PutChar (ch);
 	writeDone->P ();
 	threadPutSem->V();
-	threadGetSem->V();
 }
 
 int SynchConsole::SynchGetChar()
@@ -57,11 +55,14 @@ int SynchConsole::SynchGetChar()
 
 void SynchConsole::SynchPutString(const char s[])
 {
-	threadGetSem->P();
+	threadPutSem->P();
 	int taille = strlen(s);
 	for (int i = 0; i < taille; i++)
-		SynchPutChar(s[i]);
-	threadGetSem->V();
+	{
+		console->PutChar((int)s[i]);
+		writeDone->P ();
+	}
+	threadPutSem->V();
 }
 
 void SynchConsole::SynchGetString(char *s, int n)
