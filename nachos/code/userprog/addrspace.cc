@@ -22,6 +22,7 @@
 #include "syscall.h"
 #include "new"
 
+
 //----------------------------------------------------------------------
 // SwapHeader
 //      Do little endian to big endian conversion on the bytes in the 
@@ -62,6 +63,7 @@ SwapHeader (NoffHeader * noffH)
 
 AddrSpace::AddrSpace (OpenFile * executable)
 {
+
     NoffHeader noffH;
     unsigned int i, size;
 
@@ -122,6 +124,11 @@ AddrSpace::AddrSpace (OpenFile * executable)
 	   size - UserStacksAreaSize, UserStacksAreaSize);
 
     pageTable[0].valid = FALSE;			// Catch NULL dereference
+
+    #ifdef CHANGED
+    stackMap = new BitMap(UserStacksAreaSize/256 - 1);
+    stackMap->Mark(0);
+    #endif
 }
 
 //----------------------------------------------------------------------
@@ -134,6 +141,11 @@ AddrSpace::~AddrSpace ()
   // LB: Missing [] for delete
   // delete pageTable;
   delete [] pageTable;
+
+  #ifdef CHANGED
+    delete stackMap;
+  #endif
+
   // End of modification
 }
 
@@ -184,13 +196,32 @@ AddrSpace::SaveState ()
 }
 
 
-int
-AddrSpace::AllocateUserStack ()
+#ifdef CHANGED
+
+void AddrSpace::clearStackSlot(int index)
 {
-    return numPages * PageSize - 256;
+    stackMap->Clear(index);
+}
+
+int AddrSpace::stackTop()
+{
+    return numPages*PageSize-16;
 }
 
 
+int 
+AddrSpace::AllocateUserStack()
+{
+    int newStack = stackMap->Find();
+    if(newStack > 0)
+        return newStack;
+    else
+        printf("\nNo slots available, stopping Nachos !!\n");
+
+    return -1;
+}
+
+#endif
 
 //----------------------------------------------------------------------
 // AddrSpace::RestoreState

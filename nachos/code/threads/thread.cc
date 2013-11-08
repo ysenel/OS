@@ -22,7 +22,10 @@
 #include "valgrind.h"
 #ifdef USER_PROGRAM
 #include "machine.h"
+#include "bitmap.h"
 #endif
+
+
 
 
 #define STACK_FENCEPOST 0xdeadbeef	// this is put at the top of the
@@ -175,6 +178,7 @@ Thread::Finish ()
     Sleep ();			// invokes SWITCH
     // not reached
 }
+
 
 //----------------------------------------------------------------------
 // Thread::Yield

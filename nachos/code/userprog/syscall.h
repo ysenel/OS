@@ -148,7 +148,7 @@ char GetChar();
 void GetString(char* s, int n);
 void PutInt(int n);
 void GetInt(int *n);
-int ThreadCreate(void f(void *arg), void *arg);
+int ThreadCreate(void f(void *), void *arg);
 void ThreadExit(void);
 
 

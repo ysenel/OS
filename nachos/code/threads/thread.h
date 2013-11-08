@@ -135,10 +135,16 @@ class Thread:dontcopythis
     int userRegisters[NumTotalRegs];	// user-level CPU register state
 
   public:
+
     void SaveUserState ();	// save user-level register state
     void RestoreUserState ();	// restore user-level register state
 
     AddrSpace *space;		// User code this thread is running.
+
+    #ifdef CHANGED
+    int stackSlot;
+    #endif
+    
 #endif
 };
 

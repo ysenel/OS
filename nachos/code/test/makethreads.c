@@ -3,41 +3,21 @@
 
 
 
-/*void testd(int titi)
+/*void testd(void *titi)
 {
 	
 	PutString("salut\n");
-	int j;
-	for (j = 0; j < 9; j++)
-	{
-
-		titi++;
-		PutInt(titi);
-	}
-
-	PutChar('q');
-
 	ThreadExit();
 }*/
 
-void test(void *toto)
+void test(void * j)
 {
-	/*volatile int cpt = 0;
-	int i;
-	for(i = 0; i < 10; i++)
-		PutInt(cpt++);*/
+	int i = (char) j;
 
-	//PutInt(i);
-	/*int i;
-	for (i = 0; i < 9; i++)
-	{
-		toto++;
-		PutInt(toto);
-	}
-*/
-	int i;
-	for(i=0; i<50; i++)
-		PutChar('a');
+	PutChar('-');
+	PutChar(i);
+	PutChar('-');
+
 	ThreadExit();
 }
 
@@ -45,19 +25,12 @@ void test(void *toto)
 
 int main()
 {
-	int j = 0;
-	//int i = 40000;
-	
-	ThreadCreate(&test, &j);
-	//ThreadCreate(&testd, &j);
-	
-	PutChar('m');
+	int j = 'a';
+	int i = 9;
+
+	for(i = 0; i < 6; i++)
+		ThreadCreate(test, (void *)j);
 
 
-	/*while(i>0)
-	{
-		i--;
-	};*/
-	
 	return 0;
 }

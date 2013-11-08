@@ -26,9 +26,13 @@
 #include "syscall.h"
 
 #ifdef CHANGED
+
 #include <limits.h>
 #include "userthread.h"
+#include "synch.h"
+
 extern Semaphore *mainStop;
+
 #endif
 
 //----------------------------------------------------------------------
@@ -103,6 +107,7 @@ ExceptionHandler (ExceptionType which)
 				mainStop->P();
 			    
 				printf("\nEnd of program: return value %d\n", machine->ReadRegister(4));
+				delete mainStop;
 				interrupt->Halt();
 				
 			    break;
@@ -145,7 +150,6 @@ ExceptionHandler (ExceptionType which)
 				int i = machine->ReadRegister(4);
 				int j = machine->ReadRegister(5);
 				do_ThreadCreate(i, j);
-
 				break;
 
 			}
@@ -154,9 +158,7 @@ ExceptionHandler (ExceptionType which)
 			case SC_ThreadExit:
 			{
 				do_ThreadExit();
-
 				break;
-
 			}
 			
 
