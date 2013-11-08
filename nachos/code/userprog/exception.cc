@@ -104,10 +104,18 @@ ExceptionHandler (ExceptionType which)
 			case SC_Exit:
 			{
 				DEBUG ('a', "Shutdown, initiated by user program.\n");
+
+				/* The main thread stops at this point   */
+				/* while user threads are still running. */
+
 				mainStop->P();
 			    
 				printf("\nEnd of program: return value %d\n", machine->ReadRegister(4));
+
+				/* Delete the semaphore. */
 				delete mainStop;
+
+				/* Stop Nachos. */
 				interrupt->Halt();
 				
 			    break;

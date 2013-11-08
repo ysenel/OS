@@ -8,6 +8,7 @@
 static Semaphore *readAvail;
 static Semaphore *writeDone;
 
+/* Semaphores for protecting input and output of the threads. */
 static Semaphore *threadPutSem;
 static Semaphore *threadGetSem;
 

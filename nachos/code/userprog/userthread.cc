@@ -6,23 +6,26 @@
 
 static void StartUserThread(void *schmurtz);
 
+
+/* Structure used to pass parameters to StartUserThread. */
 typedef struct 
 {
-	int f;
-	int arg;
-    int stackAdresse;
+	int f; /* the function */
+	int arg; /* its parameters */
+    int stackAdresse; /* it's stack top */
 
 }threadInfo;
 
-Semaphore *mainStop = new Semaphore("mainStop", 1);
 
+/* Semaphore to stop the main thread from finishing before the user threads. */
+Semaphore *mainStop = new Semaphore("mainStop", 1);
 
 static int thread_count = 0;
 
 
 int do_ThreadCreate(int f, int arg)
 {
-
+    /* if another thread is created from the main one. */
     if(thread_count == 0)
         mainStop->P();
     
@@ -34,6 +37,8 @@ int do_ThreadCreate(int f, int arg)
 	t->arg = arg;
 
 	Thread *newThread = new Thread("newThread");
+
+    /* Every thread will share an adresse space. */
     newThread->space = currentThread->space;
 
     int bitmapIndex = currentThread->space->AllocateUserStack();
@@ -41,11 +46,13 @@ int do_ThreadCreate(int f, int arg)
 
     if(bitmapIndex > 0)
     {
+        /* If there was a free stack slot. */
         newThread->stackSlot = bitmapIndex;
         newThread->Start(StartUserThread, t);
     }
     else
     {
+        /* If no slots were found, free the structure and stop Nachos. */
         free(t);
         delete newThread;
         interrupt->Halt();
@@ -91,9 +98,11 @@ static void StartUserThread(void *schmurtz)
 
 void do_ThreadExit()
 {
+    /* If the main thread is the only one left, unblock the semaphore. */
     if(thread_count == 1)
         mainStop->V();
     
+    /* Free the slot in the stackMap. */
     currentThread->space->stackMap->Clear(currentThread->stackSlot);
     thread_count--;
     currentThread->Finish();

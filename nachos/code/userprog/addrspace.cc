@@ -126,8 +126,14 @@ AddrSpace::AddrSpace (OpenFile * executable)
     pageTable[0].valid = FALSE;			// Catch NULL dereference
 
     #ifdef CHANGED
+
+    /* Creation of the BitMap, the -1 comes from the main thread, */
+    /* that starts it's stack at 16 from the top.                 */
     stackMap = new BitMap(UserStacksAreaSize/256 - 1);
+
+    /* The main stacks index is marked. */
     stackMap->Mark(0);
+
     #endif
 }
 
@@ -200,11 +206,14 @@ AddrSpace::SaveState ()
 
 void AddrSpace::clearStackSlot(int index)
 {
+    /* Free a slot because a thread has finished. */
     stackMap->Clear(index);
 }
 
 int AddrSpace::stackTop()
 {
+    /* Returns the top of the stack, minus 16 because of the */
+    /* main thread, that starts at 16 from the "real" top.   */
     return numPages*PageSize-16;
 }
 
@@ -212,12 +221,16 @@ int AddrSpace::stackTop()
 int 
 AddrSpace::AllocateUserStack()
 {
+    /* Find an empty slot in the bitmap. */
     int newStack = stackMap->Find();
+
+    /* Was there a free slot ? */
     if(newStack > 0)
         return newStack;
     else
         printf("\nNo slots available, stopping Nachos !!\n");
 
+    /* returns -1 if no slots were available. */
     return -1;
 }
 

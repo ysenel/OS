@@ -38,10 +38,18 @@ class AddrSpace:dontcopythis
     void RestoreState ();	// info on a context switch 
    
     #ifdef CHANGED
+
+    /* Called when a thread is created. */
     int AllocateUserStack ();
+
+    /* Called when a thread finishes. */
     void clearStackSlot(int index);
+
+    /* Returns the top of the stack. */
     int stackTop();
 
+    /* This is the the map used for the user thread stacks.   */
+    /* public for direct acces, should maybe be private with. */
     BitMap *stackMap;
     #endif
 
