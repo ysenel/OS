@@ -71,7 +71,7 @@ void SynchConsole::SynchGetString(char *s, int n)
 	char c;
 	for(int i = 0; i < n; i++)
 	{
-		c = (int)SynchGetChar();
+		c = (int)console->GetChar();
 		if(c == EOF || c == '\n')
 			break;
 		s[i] = c;
