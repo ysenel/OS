@@ -204,6 +204,12 @@ AddrSpace::SaveState ()
 
 #ifdef CHANGED
 
+static void ReadAtVirtual(OpenFile *executable, int virtualaddr, int numBytes, int position, TranslationEntry *pageTable, unsigned numPages){
+        
+
+
+}
+
 void AddrSpace::clearStackSlot(int index)
 {
     /* Free a slot because a thread has finished. */

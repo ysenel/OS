@@ -39,6 +39,9 @@ class AddrSpace:dontcopythis
    
     #ifdef CHANGED
 
+    static void ReadAtVirtual(OpenFile *executable, int virtualaddr, int numBytes, int position, TranslationEntry *pageTable, unsigned numPages);
+
+
     /* Called when a thread is created. */
     int AllocateUserStack ();
 
