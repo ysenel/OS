@@ -1,43 +1,23 @@
 #include "syscall.h"
 
-void print(char c, int n)
-{
-	int i;
-
-	#if 1
-		for (i = 0; i < n; i++)
-		{
-			PutChar(c + i);
-		}
-			
-		PutChar('\n');
-	#endif
-}
-
-void print_string(char *s)
-{
-	PutString(s);
-}
-
 
 int main()
 {
+	int i = 0;
 
-	/*char c = GetChar();
-	PutChar(c);*/
-
-	//print_string("hello world\n");
-	//char buf[100];
-	//GetString(buf,10);
-	PutString("Hi\n");
-	PutString("Hell\n");
-	PutString("Helloworld\n");
-
-	/*int a;
-	GetInt(&a);
-
-	PutInt(a);*/
-
+	//PutString("Hi\n");
+	/*PutString("Hell\n");
+	PutString("Helloworld\n");*/
+	//PutString("ccc");
 	
+	PutString("toto1\n");
+	PutString("toto2\n");
+	PutString("toto3\n");
+	PutString("toto4\n");
 	//Halt();
+
+	/*while(i < 4) 
+		i++;*/
+	
+	
 }

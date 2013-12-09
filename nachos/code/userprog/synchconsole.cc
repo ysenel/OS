@@ -7,7 +7,7 @@
 
 static Semaphore *readAvail;
 static Semaphore *writeDone;
-
+static Semaphore *toto;
 /* Semaphores for protecting input and output of the threads. */
 static Semaphore *threadPutSem;
 static Semaphore *threadGetSem;
@@ -20,6 +20,7 @@ SynchConsole::SynchConsole(const char *in, const char *out)
 {
 	readAvail = new Semaphore("read avail", 0);
 	writeDone = new Semaphore("write done", 0);
+	toto = new Semaphore("toto", 1);
 
 	threadPutSem = new Semaphore("thread put", 1);
 	threadGetSem = new Semaphore("thread get", 1);
@@ -34,6 +35,7 @@ SynchConsole::~SynchConsole()
 	delete readAvail;
 	delete threadPutSem;
 	delete threadGetSem;
+	delete toto;
 }
 
 void SynchConsole::SynchPutChar(int ch)
@@ -87,6 +89,7 @@ void SynchConsole::SynchGetString(char *s, int n)
 
 int copyStringFromMachine(int from, char *to, unsigned size)
 {
+	toto->P();
 	int tmp;
 	unsigned i = 0;
 
@@ -101,7 +104,7 @@ int copyStringFromMachine(int from, char *to, unsigned size)
 	}
 	
 	to[i] = '\0';
-
+	toto->V();
 	return i;
 }
 

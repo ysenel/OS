@@ -20,7 +20,11 @@
 #include "addrspace.h"
 #include "noff.h"
 #include "syscall.h"
+#include "PageProvider.h"
 #include "new"
+
+
+static void ReadAtVirtual(OpenFile *executable, int virtualaddr, int numBytes, int position, TranslationEntry *pageTable, unsigned numPages);
 
 
 //----------------------------------------------------------------------
@@ -86,15 +90,17 @@ AddrSpace::AddrSpace (OpenFile * executable)
     // virtual memory
     if (numPages > NumPhysPages)
 	    throw std::bad_alloc();
-
-    DEBUG ('a', "Initializing address space, num pages %d, total size 0x%x\n",
+    
+    DEBUG ('p', "Initializing address space, num pages %d, total size 0x%x\n",
 	   numPages, size);
+
 // first, set up the translation 
     pageTable = new TranslationEntry[numPages];
     for (i = 0; i < numPages; i++)
       {
-	  pageTable[i].physicalPage = i;	// for now, phys page # = virtual page #
-	  pageTable[i].valid = TRUE;
+	  pageTable[i].physicalPage = pageProvider->GetEmptyPage();	// for now, phys page # = virtual page #
+	  //printf("page: %d\n", pageTable[i].physicalPage);
+      pageTable[i].valid = TRUE;
 	  pageTable[i].use = FALSE;
 	  pageTable[i].dirty = FALSE;
 	  pageTable[i].readOnly = FALSE;	// if the code segment was entirely on 
@@ -102,22 +108,29 @@ AddrSpace::AddrSpace (OpenFile * executable)
 	  // pages to be read-only
       }
 
+      #ifdef CHANGED
+
 // then, copy in the code and data segments into memory
     if (noffH.code.size > 0)
       {
 	  DEBUG ('a', "Initializing code segment, at 0x%x, size 0x%x\n",
 		 noffH.code.virtualAddr, noffH.code.size);
-	  executable->ReadAt (&(machine->mainMemory[noffH.code.virtualAddr]),
-			      noffH.code.size, noffH.code.inFileAddr);
+
+      ReadAtVirtual(executable, noffH.code.virtualAddr, noffH.code.size, noffH.code.inFileAddr, pageTable, numPages);
+
+	  /*executable->ReadAt (&(machine->mainMemory[noffH.code.virtualAddr]),
+			      noffH.code.size, noffH.code.inFileAddr);*/
       }
     if (noffH.initData.size > 0)
       {
 	  DEBUG ('a', "Initializing data segment, at 0x%x, size 0x%x\n",
 		 noffH.initData.virtualAddr, noffH.initData.size);
-	  executable->ReadAt (&
+
+      ReadAtVirtual(executable, noffH.initData.virtualAddr, noffH.initData.size, noffH.initData.inFileAddr, pageTable, numPages);
+	  /*executable->ReadAt (&
 			      (machine->mainMemory
 			       [noffH.initData.virtualAddr]),
-			      noffH.initData.size, noffH.initData.inFileAddr);
+			      noffH.initData.size, noffH.initData.inFileAddr);*/
       }
 
     DEBUG ('a', "Area for stacks at 0x%x, size 0x%x\n",
@@ -125,7 +138,7 @@ AddrSpace::AddrSpace (OpenFile * executable)
 
     pageTable[0].valid = FALSE;			// Catch NULL dereference
 
-    #ifdef CHANGED
+    //#ifdef CHANGED
 
     /* Creation of the BitMap, the -1 comes from the main thread, */
     /* that starts it's stack at 16 from the top.                 */
@@ -204,8 +217,22 @@ AddrSpace::SaveState ()
 
 #ifdef CHANGED
 
-static void ReadAtVirtual(OpenFile *executable, int virtualaddr, int numBytes, int position, TranslationEntry *pageTable, unsigned numPages){
-        
+static void ReadAtVirtual(OpenFile *executable, int virtualaddr, int numBytes, int position, TranslationEntry *pageTable, unsigned numPages)
+{
+    char *buffer = new char[numBytes];       
+    int bytes = executable->ReadAt(buffer, numBytes, position);
+
+    TranslationEntry *tmpTable = machine->pageTable;
+    unsigned tmpNumPages = machine->pageTableSize;
+
+    machine->pageTable = pageTable;
+    machine->pageTableSize = numPages;
+
+    for(int i = 0; i < bytes ; i++)
+        machine->WriteMem(virtualaddr++, 1, buffer[i]);
+
+    machine->pageTable = tmpTable;
+    machine->pageTableSize = tmpNumPages;
 
 
 }

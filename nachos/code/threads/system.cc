@@ -9,7 +9,11 @@
 #include "system.h"
 //#include "synchconsole.h"
 #include <locale.h>
+//#include "../userprog/PageProvider.h"
 
+#ifdef USER_PROGRAM
+//#include "PageProvider.h"
+#endif
 
 // This defines *all* of the global data structures used by Nachos.
 // These are all initialized and de-allocated by this file.
@@ -32,6 +36,7 @@ SynchDisk *synchDisk;
 
 #ifdef USER_PROGRAM		// requires either FILESYS or FILESYS_STUB
 Machine *machine;		// user program memory and registers
+PageProvider *pageProvider;
 #endif
 
 #ifdef NETWORK
@@ -168,6 +173,7 @@ Initialize (int argc, char **argv)
 
 #ifdef USER_PROGRAM
     machine = new Machine (debugUserProg);	// this must come first
+    pageProvider = new PageProvider(NumPhysPages);
 #endif
 
 #ifdef FILESYS

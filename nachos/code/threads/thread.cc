@@ -113,10 +113,15 @@ Thread::Start (VoidFunctionPtr func, void *arg)
     ASSERT(status == JUST_CREATED);
     StackAllocate (func, arg);
 
+    printf("Starting\n");
+
     IntStatus oldLevel = interrupt->SetLevel (IntOff);
+    printf("avant readytorun\n");
     scheduler->ReadyToRun (this);	// ReadyToRun assumes that interrupts 
     // are disabled!
+    printf("avant readytorun\n");
     (void) interrupt->SetLevel (oldLevel);
+    printf("Starting2\n");
 }
 
 //----------------------------------------------------------------------

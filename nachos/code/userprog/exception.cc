@@ -30,6 +30,7 @@
 #include <limits.h>
 #include "userthread.h"
 #include "synch.h"
+#include "userprocess.h"
 
 extern Semaphore *mainStop;
 
@@ -115,9 +116,11 @@ ExceptionHandler (ExceptionType which)
 				/* Delete the semaphore. */
 				delete mainStop;
 
+				//while(1);
+				printf("End program\n");
 				/* Stop Nachos. */
 				interrupt->Halt();
-				
+
 			    break;
 			}
 
@@ -218,6 +221,22 @@ ExceptionHandler (ExceptionType which)
 			    DEBUG ('a', "PutString\n");
 			    break;
 			}
+
+			case SC_ForkExec:
+			{
+
+				int c =  machine->ReadRegister(4);
+				char *buffer = new char[MAX_STRING_SIZE+1];
+
+				copyStringFromMachine(c, buffer, MAX_STRING_SIZE);
+				printf("'%s'\n", buffer);
+				StartUserProcess(buffer);
+
+				break;
+			}
+
+
+
 			#endif
 
 			default:
@@ -231,6 +250,10 @@ ExceptionHandler (ExceptionType which)
 	    UpdatePC ();
 	    break;
 	}
+
+	case IllegalInstrException:
+		printf("Ilegql instruction\n");
+		break;
 
 	case PageFaultException:
 	  if (!type) {
